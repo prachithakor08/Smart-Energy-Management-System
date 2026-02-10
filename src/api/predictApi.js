@@ -1,8 +1,8 @@
 export const predictAlert = async (substation) => {
-  console.log("Sending to backend:", {
-    id: substation.id,
-    payload: substation.payload,
-  });
+  // console.log("Sending to backend:", {
+  //   id: substation.id,
+  //   payload: substation.payload,
+  // });
 
   const res = await fetch("http://localhost:5000/predict-alert", {
     method: "POST",

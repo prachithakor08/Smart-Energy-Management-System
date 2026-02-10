@@ -35,7 +35,7 @@ export default function Alerts() {
           )}
 
           {alert.status === "Acknowledged" && (
-            <button onClick={() => updateStatus(alert.id, "Resolved")}>
+            <button class="btn btn-primary" onClick={() => updateStatus(alert.id, "Resolved")}>
               Resolve
             </button>
           )}
