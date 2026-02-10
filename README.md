@@ -133,7 +133,7 @@ python app.py
 ### Admin Dashboard Overview
 Displays total substations, active alerts, and alert severity summary with visualization
 
-![Dashboard Overview](screenshots/dashboard-overview.png)
+![Dashboard Overview](screenshots/substation.png)
 
 ---
 
@@ -143,23 +143,35 @@ Visual representation of substation connectivity with color-coded operational st
 - 🟢 Normal Operation  
 - 🔴 Critical Power Loss Detected  
 
-![Grid Topology](screenshots/grid-topology.png)
+![Grid Topology](screenshots/dashboard.png)
 
 ---
 
 ### Alerts 
 Active alerts are logged here providing admin to manage it by acknowledgement or resolution
 
-![Alert](screenshots/alert-history.png)
+![Alert](screenshots/alerts.png)
 
 ---
 ### Alert History
 Historical log of detected alerts for analysis and decision support.
 
-![Alert History](screenshots/alert-history.png)
+![Alert History](screenshots/alert_history.png)
+
+---
+### Resolved Alerts
+
+
+![Alert Resolved](screenshots/resolved_alerts.png)
 
 ---
 ### Csv Upload
 Admins can check alerts using CSV file uploads.
 
-![CSV Upload](screenshots/alert-history.png)
+![CSV Upload](screenshots/csv_upload.png)
+
+---
+### Login
+![Login](screenshots/login.png)
+
+---
