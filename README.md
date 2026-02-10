@@ -1,8 +1,47 @@
 # ⚡ AI-Powered Smart Energy Management System (Smart EMS)
 
-An intelligent, AI-driven platform for monitoring electrical substations, detecting technical power losses caused by poor power factor, and generating real-time alerts using deep learning models trained on SCADA data.
+An intelligent, AI-driven platform for monitoring electrical substations, detecting technical power losses caused by poor power factor, and generating real-time alerts using deep learning models trained on SCADA (Supervisory Control and Data Acquisition) data.
 
 ---
+## ⚡ Problem Motivation & Sustainability Impact
+
+In real-world power distribution systems, consumers receive electricity from utility providers based on contracted energy units. For example, a large industrial consumer may receive **80 units of electrical energy** from the utility supply. However, during transmission and internal distribution across electrical substations and industrial infrastructure, **technical power losses** occur.
+
+These losses are primarily caused by factors such as:
+- Poor power factor
+- Inefficient energy utilization
+- Reactive power flow
+- Substation-level inefficiencies
+
+As a result, although 80 units of energy are supplied, a significant portion is **lost before being effectively utilized**. This leads to:
+- **Wastage of electrical energy**
+- **Higher electricity bills for energy that is not actually used**
+- **Reduced utilization of supplied power**
+- **Negative impact on sustainability and energy efficiency**
+- **Increased operational costs for industries**
+
+In large-scale industrial environments, such inefficiencies often remain unnoticed due to the absence of intelligent monitoring systems that can identify *when*, *where*, and *why* the losses occurred.
+
+### Project Objective in This Context
+
+The primary objective of this project is to **detect technical power losses at the electrical substation level**, with a strong focus on **power factor–dependent losses**. By continuously monitoring SCADA data and analyzing parameters such as voltage, current, power factor, and transformer temperature, the system identifies periods during which abnormal losses occur.
+
+Once power loss is detected:
+- Operators can identify the **exact time period** when losses occurred
+- Analyze operational conditions responsible for the loss
+- Take **preventive or corrective actions** such as power factor correction, load balancing, or equipment optimization
+- Prevent recurrence of the same inefficient operating conditions
+
+### Impact on Energy Efficiency & Sustainability
+
+By detecting and analyzing power loss patterns, the system enables industries to:
+- Utilize electricity closer to its **full potential**
+- Reduce unnecessary energy wastage
+- Lower electricity costs
+- Improve sustainability and environmental responsibility
+- Support smarter and more efficient power distribution systems
+
+This AI-driven approach transforms substations from passive distribution units into **intelligent energy monitoring systems**, contributing to sustainable industrial energy management.
 
 ## 📌 Project Purpose
 
@@ -12,46 +51,7 @@ By integrating **Artificial Intelligence with SCADA data**, the project aims to 
 
 ---
 
-## 🧠 Hypothesis
-
-We hypothesize that an AI-powered smart energy management system utilizing SCADA data and a **hybrid GRU–Autoencoder deep learning model** can effectively detect technical power losses arising from **poor power factor and inefficient energy utilization** in electrical substations.
-
-By learning temporal patterns in parameters such as:
-- Voltage  
-- Current  
-- Power Factor  
-- Transformer Temperature  
-
-the system can identify deviations that indicate increased losses. This approach improves operational awareness, reduces dependency on manual monitoring, and enhances the efficiency and reliability of substations compared to conventional methods.
-
----
-
-## 📄 Project Abstract
-
-This project presents the development of an **AI-Powered Smart Energy Management System** for electrical substations using SCADA data and advanced deep learning techniques.
-
-A **hybrid GRU–Autoencoder model** is employed to learn temporal patterns in electrical parameters such as voltage, current, power factor, and transformer temperature. Since each substation operates differently, the model is **trained separately for each substation** using its historical SCADA data. This **substation-specific training approach** enables accurate learning of normal operating behavior and precise detection of efficiency losses unique to each installation.
-
-The system performs **real-time loss detection** and generates alerts when increased losses due to poor power factor are detected. An **interactive web dashboard** visualizes system status, alerts, and alert history, supporting informed operational decision-making.
-
-The project aims to reduce technical losses, improve energy efficiency, and support smarter and more reliable power distribution systems.
-
----
-
-## 🎯 Aims & Objectives
-
-- Design and develop an AI-based system for monitoring electrical substations using SCADA data  
-- Preprocess and analyze parameters such as voltage, current, power factor, and transformer temperature  
-- Implement a hybrid **GRU–Autoencoder** model for anomaly and loss detection  
-- Detect technical power losses caused by poor power factor  
-- Generate real-time alerts when losses are detected  
-- Maintain alert history for analysis and reporting  
-- Provide a visual dashboard for monitoring system status and alerts  
-- Evaluate system performance using metrics such as accuracy, MAE, and RMSE  
-
----
-
-## 🖥️ Features (As Shown in Dashboard)
+## 🖥️ Features 
 
 ### 🔐 Admin Authentication
 - Secure admin login
@@ -59,7 +59,7 @@ The project aims to reduce technical losses, improve energy efficiency, and supp
 
 ### 📊 Dashboard Overview
 - **Total Substations Count**
-- **Total Active Alerts**
+- **Total Active Alerts - Alerts which are to be resolved**
 - **Critical Alerts Count**
 - **Warning Alerts Count**
 
@@ -78,6 +78,7 @@ The project aims to reduce technical losses, improve energy efficiency, and supp
 
 ### 🕒 Alert History
 - Historical record of all detected alerts
+- Alerts which get resolved are moved to alert history
 - Supports trend analysis and operational review
 
 ### 📁 CSV Upload
@@ -110,40 +111,13 @@ The project aims to reduce technical losses, improve energy efficiency, and supp
 - Pandas
 - NumPy
 - SCADA data in CSV format
-
----
-
-## 🔬 Methodology Overview
-
-### Phase 1: System Design & Model Development
-- Requirement analysis and architecture design
-- Model development using historical SCADA data
-- Frontend dashboard development
-- Backend and ML integration
-
-### Phase 2: Testing, Evaluation & Optimization
-- Unit and system testing
-- Performance evaluation using accuracy, MAE, RMSE
-- Model tuning and dashboard refinement
-- Documentation and deployment readiness
-
----
-
-## 🚀 Scope for Future Enhancements
-
-- Predictive loss forecasting
-- Trend analysis and early warning system
-- Advanced deep learning architectures
-- Integration with real-time SCADA systems
-- Scalability for large smart grid deployments
-
 ---
 
 ## 🧑‍💻 How to Run (Basic)
 
 ```bash
 # Frontend
-cd frontend
+cd smart_ems_dashboard
 npm install
 npm run dev
 
@@ -151,3 +125,41 @@ npm run dev
 cd backend
 pip install -r requirements.txt
 python app.py
+
+```
+---
+## 📸 Dashboard Screenshots
+
+### Admin Dashboard Overview
+Displays total substations, active alerts, and alert severity summary with visualization
+
+![Dashboard Overview](screenshots/dashboard-overview.png)
+
+---
+
+### Grid Topology Visualization
+Visual representation of substation connectivity with color-coded operational status.
+
+- 🟢 Normal Operation  
+- 🔴 Critical Power Loss Detected  
+
+![Grid Topology](screenshots/grid-topology.png)
+
+---
+
+### Alerts 
+Active alerts are logged here providing admin to manage it by acknowledgement or resolution
+
+![Alert](screenshots/alert-history.png)
+
+---
+### Alert History
+Historical log of detected alerts for analysis and decision support.
+
+![Alert History](screenshots/alert-history.png)
+
+---
+### Csv Upload
+Admins can check alerts using CSV file uploads.
+
+![CSV Upload](screenshots/alert-history.png)
