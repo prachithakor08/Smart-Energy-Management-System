@@ -1,0 +1,191 @@
+from flask import Blueprint, request, jsonify
+import pandas as pd
+from collections import defaultdict, deque
+from database import alerts_collection
+from datetime import datetime
+from models.model import predict_alert, FEATURE_COLS, WINDOW
+import joblib
+
+predict_bp = Blueprint("predict_bp", __name__)
+
+metadata = joblib.load("models/gruae_metadata_v2.pkl")
+RE_TH = metadata["recon_threshold"]
+PF_IDX = metadata["pf_index"]
+
+# Rolling buffer per substation
+substation_buffers = defaultdict(lambda: deque(maxlen=WINDOW))
+
+# UI → Model mapping
+UI_TO_MODEL_MAP = {
+    "active_power": "Active Power Total",
+    "apparent_power": "Apparent Power Total",
+    "reactive_power": "Reactive Power Total",
+    "power_factor": "Power Factor Total",
+    "current_a": "Current A",
+    "current_b": "Current B",
+    "current_c": "Current C",
+    "current_avg": "Current Avg",
+    "voltage_ab": "Voltage A-B",
+    "voltage_bc": "Voltage B-C",
+    "voltage_ca": "Voltage C-A",
+    "voltage_ll_avg": "Voltage L-L Avg",
+    "frequency": "Frequency",
+    "thd_current_a": "THD Current A",
+    "thd_current_b": "THD Current B",
+    "thd_current_c": "THD Current C",
+    "thd_voltage_ab": "THD Voltage A-B",
+    "thd_voltage_bc": "THD Voltage B-C",
+    "thd_voltage_ca": "THD Voltage C-A"
+}
+
+
+# SINGLE SUBSTATION PREDICTION (REAL-TIME)
+@predict_bp.route("/predict-alert", methods=["POST"])
+def predict_alert_api():
+
+    data = request.get_json()
+
+    if not isinstance(data, dict):
+        return jsonify({"error": "JSON body must be an object"}), 400
+    if "id" not in data:
+        return jsonify({"error": "Missing 'id' field"}), 400
+    if "payload" not in data:
+        return jsonify({"error": "Missing 'payload' field"}), 400
+
+    substation_id = data["id"]
+    payload = data["payload"]
+
+    # Validate features
+    missing = [f for f in FEATURE_COLS if f not in payload]
+    if missing:
+        return jsonify({
+            "error": "Missing features",
+            "missing": missing
+        }), 400
+
+    row_df = pd.DataFrame([payload], columns=FEATURE_COLS)
+
+# [this is temporrary for demo] PREFILL BUFFER (FOR DASHBOARD DEMO) --------------------
+    if len(substation_buffers[substation_id]) == 0:
+        for _ in range(WINDOW - 1):
+            substation_buffers[substation_id].append(row_df.iloc[0])
+
+# Append current reading
+    substation_buffers[substation_id].append(row_df.iloc[0])
+
+
+    current_len = len(substation_buffers[substation_id])
+
+    if current_len < WINDOW:
+        return jsonify({
+            "status": "INSUFFICIENT_DATA",
+            "received": current_len,
+            "required": WINDOW,
+            "anomalyScore": None
+        })
+
+    window_df = pd.DataFrame(list(substation_buffers[substation_id]))
+
+    # -------------------- MODEL PREDICTION --------------------
+    _, recon_error = predict_alert(window_df)
+
+    # -------------------- SCORE NORMALIZATION --------------------
+    normalized_score = recon_error / (RE_TH * 3)
+
+
+    # -------------------- DOMAIN LOGIC --------------------
+    pf = payload["Power Factor Total"]
+    PF_REF = 0.95
+
+    loss = (1 / (pf ** 2)) - (1 / (PF_REF ** 2))
+
+    is_anomaly = recon_error > RE_TH
+    pf_bad = pf < 0.8
+    loss_high = loss > 0.5
+
+    final_event = is_anomaly and pf_bad and loss_high
+
+    # -------------------- SEVERITY MAPPING --------------------
+    if final_event:
+        if normalized_score >= 0.4:
+            severity = "CRITICAL"
+        elif normalized_score >= 0.7:
+            severity = "WARNING"
+        else:
+            severity = "NORMAL"
+    else:
+        severity = "NORMAL"
+
+# -------------------- ALERT CREATION --------------------
+    if severity != "NORMAL":
+        existing = alerts_collection.find_one({
+            "substationId": substation_id,
+            "status": {"$ne": "Resolved"}
+        })
+
+        if not existing:
+            alerts_collection.insert_one({
+                "substationId": substation_id,
+                "substationName": data.get("name", substation_id),
+                "severity": severity,
+                "anomalyScore": float(normalized_score),
+                "message": "AI-detected power quality anomaly",
+                "status": "New",
+                "createdAt": datetime.utcnow(),
+                "acknowledgedAt": None,
+                "resolvedAt": None
+            })
+
+# -------------------- RESPONSE TO UI --------------------
+    return jsonify({
+        "substation_id": substation_id,
+        "status": severity,
+        "anomalyScore": float(normalized_score)
+    })
+
+
+# ------------------------------------------------------------------
+# CSV BATCH TESTING (UNCHANGED)
+# ------------------------------------------------------------------
+@predict_bp.route("/predict-alert-csv", methods=["POST"])
+def predict_alert_csv():
+    if "file" not in request.files:
+        return jsonify({"error": "CSV file not provided"}), 400
+
+    file = request.files["file"]
+
+    try:
+        df = pd.read_csv(file)
+    except Exception:
+        return jsonify({"error": "Invalid CSV file"}), 400
+
+    missing = [f for f in FEATURE_COLS if f not in df.columns]
+    if missing:
+        return jsonify({
+            "error": "Missing features in CSV",
+            "missing": missing
+        }), 400
+
+    results = []
+
+    for i in range(len(df) - WINDOW + 1):
+        window_df = df.iloc[i:i + WINDOW][FEATURE_COLS]
+
+        # 🔥 FIX
+        window_df = window_df.apply(pd.to_numeric, errors="coerce")
+        window_df = window_df.fillna(window_df.mean())
+
+        is_alert, score = predict_alert(window_df)
+
+        results.append({
+            "window_start_row": int(i),
+            "window_end_row": int(i + WINDOW - 1),
+            "status": "ALERT" if is_alert else "NORMAL",
+            "anomalyScore": float(score)
+        })
+
+
+    return jsonify({
+        "total_windows": len(results),
+        "results": results
+    })

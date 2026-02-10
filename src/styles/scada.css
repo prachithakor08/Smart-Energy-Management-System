@@ -1,0 +1,101 @@
+/* ---------- GLOBAL ---------- */
+body {
+  background-color: #f4f6f8;
+  color: #1f2937;
+}
+
+/* ---------- BADGES ---------- */
+.badge {
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.badge-green {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.badge-red {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.badge-yellow {
+  background: #fef9c3;
+  color: #854d0e;
+}
+
+/* ---------- CARDS ---------- */
+.card {
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+
+}
+
+/* ---------- BUTTON ---------- */
+.btn {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 15px;
+}
+
+.btn-primary {
+  background: #091a3f;
+  color: white;
+}
+/* ---------- ALERT HISTORY ---------- */
+.alert-history-container {
+  padding: 20px;
+}
+
+.alert-card {
+  background: #ffffff;
+  padding: 18px 20px;
+  margin-bottom: 15px;
+  border-radius: 10px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-width: 500px;
+}
+
+.alert-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.alert-time {
+  font-size: 13px;
+  color: #6b7280;
+}
+
+/* 🔴 CRITICAL BLINK */
+.blink-critical {
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0% { opacity: 1; }
+  50% { opacity: 0.2; }
+  100% { opacity: 1; }
+}
+
+/* 🟡 WARNING PULSE */
+.pulse-warning {
+  animation: pulse 1.5s infinite;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.25); }
+  100% { transform: scale(1); }
+}
