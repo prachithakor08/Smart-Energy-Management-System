@@ -46,12 +46,51 @@ export default function CsvUpload() {
       </button>
 
       {result && (
-        <div style={{ marginTop: "20px" }}>
-          <h4>Results</h4>
-          <p>Total Windows: {result.total_windows}</p>
-          <p>Alerts Detected: {result.results.filter(r => r.status === "ALERT").length}</p>
-        </div>
-      )}
+  <div style={{ marginTop: "30px" }}>
+    
+    {/* Substation Summary */}
+    <div
+      style={{
+        padding: "15px",
+        borderRadius: "8px",
+        backgroundColor: "#fff1f0",
+        border: "1px solid #ff4d4f",
+        marginBottom: "20px"
+      }}
+    >
+      <h4 style={{ color: "#cf1322" }}>
+        🚨 Substation Alert Summary
+      </h4>
+      <p><strong>Substation ID:</strong> 1</p>
+      <p><strong>Status:</strong> CONTINUOUS ALERT</p>
+      <p><strong>Total Alert Windows:</strong> {result.results.length}</p>
+    </div>
+
+    {/* Alert Details Table */}
+    <h5>Alert Detection Timeline</h5>
+    <table className="table table-bordered">
+      <thead>
+        <tr>
+          <th>Time Window (Row Range)</th>
+          <th>Anomaly Score</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody>
+        {result.results.map((r, index) => (
+          <tr key={index}>
+            <td>{r.window_start_row} – {r.window_end_row}</td>
+            <td>{r.anomalyScore.toFixed(2)}</td>
+            <td style={{ color: "#cf1322", fontWeight: "bold" }}>
+              {r.status}
+            </td>
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  </div>
+)}
+
     </div>
   );
 }
