@@ -12,10 +12,11 @@ export function AlertProvider({ children }) {
     setAlerts(data);
   }
 
-  async function updateStatus(id, status) {
-    await updateAlertStatus(id, status);
-    loadAlerts();
-  }
+ async function updateStatus(id, payload) {
+  await updateAlertStatus(id, payload);
+  loadAlerts();
+}
+
 
   useEffect(() => {
     loadAlerts();
@@ -23,8 +24,19 @@ export function AlertProvider({ children }) {
     return () => clearInterval(interval);
   }, []);
 
+  const saveResolutionDetails = (id, details) => {
+  setAlerts(prev =>
+    prev.map(alert =>
+      alert.id === id
+        ? { ...alert, resolutionDetails: details }
+        : alert
+    )
+  );
+};
+
+  
   return (
-    <AlertContext.Provider value={{ alerts, updateStatus }}>
+    <AlertContext.Provider value={{ alerts, updateStatus ,saveResolutionDetails }}>
       {children}
     </AlertContext.Provider>
   );

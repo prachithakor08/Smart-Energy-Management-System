@@ -65,14 +65,22 @@ def get_active_alerts():
 @alert_routes.route("/alerts/<id>", methods=["PUT"])
 def update_alert(id):
     data = request.json
-    status = data["status"]
 
-    update = {"status": status}
+    update = {}
 
-    if status == "Acknowledged":
-        update["acknowledgedAt"] = datetime.utcnow()
-    elif status == "Resolved":
-        update["resolvedAt"] = datetime.utcnow()
+    # Update status
+    if "status" in data:
+        update["status"] = data["status"]
+
+        if data["status"] == "Acknowledged":
+            update["acknowledgedAt"] = datetime.utcnow()
+
+        elif data["status"] == "Resolved":
+            update["resolvedAt"] = datetime.utcnow()
+
+    # Save resolution details if provided
+    if "resolutionDetails" in data:
+        update["resolutionDetails"] = data["resolutionDetails"]
 
     alerts_collection.update_one(
         {"_id": ObjectId(id)},
@@ -80,7 +88,6 @@ def update_alert(id):
     )
 
     return jsonify({"success": True})
-
 
 # ----------------------------
 # ALERT HISTORY
@@ -95,9 +102,12 @@ def alert_history():
             "substationName": a["substationName"],
             "severity": a["severity"],
             "resolvedAt": a["resolvedAt"],
-            "score": a["anomalyScore"]
+            "score": a["anomalyScore"],
+            "resolutionDetails": a.get("resolutionDetails", {})
         } for a in alerts
     ])
+
+
 
 
 # ----------------------------

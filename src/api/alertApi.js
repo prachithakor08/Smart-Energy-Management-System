@@ -18,11 +18,11 @@ export const createAlert = async (payload) => {
   return res.json();
 };
 
-export const updateAlertStatus = async (id, status) => {
+export const updateAlertStatus = async (id, payload) => {
   const res = await fetch(`http://localhost:5000/alerts/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ status }),
+    body: JSON.stringify(payload),
   });
 
   if (!res.ok) {
