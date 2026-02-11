@@ -62,24 +62,51 @@ export default function SubstationSLD({ substations }) {
         const [x, y] = positions[i];
 
         return (
-          <g key={s.id}>
-            <circle
-              cx={x}
-              cy={y}
-              r="18"
-              fill={getColor(s.status)}
-              className={getClass(s.status)}
-            />
-            <text
-              x={x}
-              y={y + 35}
-              textAnchor="middle"
-              fontSize="12"
-              fill="#1f2937"
-            >
-              {s.name}
-            </text>
-          </g>
+         <g key={s.id} className={getClass(s.status)}>
+  {/* Substation outer box */}
+  <rect
+    x={x - 20}
+    y={y - 20}
+    width="40"
+    height="40"
+    rx="4"
+    fill={getColor(s.status)}
+    stroke="#1f2937"
+    strokeWidth="1.5"
+  />
+
+  {/* Busbar line */}
+  <line
+    x1={x - 15}
+    y1={y}
+    x2={x + 15}
+    y2={y}
+    stroke="white"
+    strokeWidth="3"
+  />
+
+  {/* Vertical breaker line */}
+  <line
+    x1={x}
+    y1={y - 12}
+    x2={x}
+    y2={y + 12}
+    stroke="white"
+    strokeWidth="2"
+  />
+
+  {/* Substation Name */}
+  <text
+    x={x}
+    y={y + 35}
+    textAnchor="middle"
+    fontSize="12"
+    fill="#1f2937"
+  >
+    {s.name}
+  </text>
+</g>
+
         );
       })}
     </svg>
