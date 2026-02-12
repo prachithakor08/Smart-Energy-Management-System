@@ -23,7 +23,7 @@ export default function Login() {
   return (
     <div style={styles.container}>
       <form onSubmit={handleSubmit} style={styles.card}>
-        <h2>SCADA System Login</h2>
+        <h2>Smart-EMS System Login</h2>
 
         {error && <p style={styles.error}>{error}</p>}
 
@@ -45,10 +45,10 @@ export default function Login() {
 
         <button style={styles.button}>Login</button>
 
-        <p style={styles.hint}>
+        {/* <p style={styles.hint}>
           admin / admin123 <br />
           operator / operator123
-        </p>
+        </p> */}
       </form>
     </div>
   );
