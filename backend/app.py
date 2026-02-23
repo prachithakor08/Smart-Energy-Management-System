@@ -4,7 +4,7 @@ from routes.alert_routes import alert_routes
 from routes.predict_routes import predict_bp
 
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "http://localhost:5173"}}, supports_credentials=True)
 
 app.register_blueprint(alert_routes)
 app.register_blueprint(predict_bp)

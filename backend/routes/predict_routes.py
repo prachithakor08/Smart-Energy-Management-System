@@ -5,6 +5,7 @@ from database import alerts_collection
 from datetime import datetime
 from models.model import predict_alert, FEATURE_COLS, WINDOW
 import joblib
+import io
 
 predict_bp = Blueprint("predict_bp", __name__)
 
@@ -159,6 +160,22 @@ def predict_alert_csv():
     except Exception:
         return jsonify({"error": "Invalid CSV file"}), 400
 
+    # 🔥 CHECK Date & Time columns
+    if "Date" not in df.columns or "Time" not in df.columns:
+        return jsonify({
+            "error": "CSV must contain 'Date' and 'Time' columns",
+            "available_columns": list(df.columns)
+        }), 400
+
+    # 🔥 COMBINE Date + Time into single timestamp
+    df["timestamp"] = pd.to_datetime(
+        df["Date"].astype(str) + " " + df["Time"].astype(str),
+        errors="coerce"
+    )
+
+    # Sort by timestamp (IMPORTANT for sliding window)
+    df = df.sort_values("timestamp").reset_index(drop=True)
+
     missing = [f for f in FEATURE_COLS if f not in df.columns]
     if missing:
         return jsonify({
@@ -171,21 +188,42 @@ def predict_alert_csv():
     for i in range(len(df) - WINDOW + 1):
         window_df = df.iloc[i:i + WINDOW][FEATURE_COLS]
 
-        # 🔥 FIX
         window_df = window_df.apply(pd.to_numeric, errors="coerce")
         window_df = window_df.fillna(window_df.mean())
 
         is_alert, score = predict_alert(window_df)
 
+        start_time = df.iloc[i]["timestamp"]
+        end_time = df.iloc[i + WINDOW - 1]["timestamp"]
+
         results.append({
-            "window_start_row": int(i),
-            "window_end_row": int(i + WINDOW - 1),
+            "window_start_time": start_time.strftime("%Y-%m-%d %H:%M:%S"),
+            "window_end_time": end_time.strftime("%Y-%m-%d %H:%M:%S"),
             "status": "ALERT" if is_alert else "NORMAL",
             "anomalyScore": float(score)
         })
-
 
     return jsonify({
         "total_windows": len(results),
         "results": results
     })
+    
+    
+# GENERATE REPORTS OF CSV PREDICTION
+from flask import make_response
+
+@predict_bp.route("/download-report", methods=["POST"])
+def download_report():
+    data = request.json.get("results")
+
+    df = pd.DataFrame(data)
+
+    output = io.BytesIO()
+    df.to_excel(output, index=False, engine='openpyxl')
+    output.seek(0)
+
+    response = make_response(output.getvalue())
+    response.headers["Content-Disposition"] = "attachment; filename=Substation_Alert_Report.xlsx"
+    response.headers["Content-Type"] = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    return response

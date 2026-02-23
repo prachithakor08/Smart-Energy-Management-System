@@ -290,3 +290,121 @@ body {
   from { opacity: 0; transform: translateY(8px); }
   to { opacity: 1; transform: translateY(0); }
 }
+
+
+.csv-results {
+  margin-top: 30px;
+}
+
+/* SUMMARY CARD */
+.alert-summary-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+  margin-bottom: 25px;
+  border-left: 6px solid #ff4d4f;
+}
+
+.alert-summary-card h4 {
+  margin-bottom: 15px;
+  color: #cf1322;
+}
+
+/* TIMELINE CARD */
+.timeline-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.08);
+}
+
+.timeline-card h5 {
+  margin-bottom: 15px;
+}
+
+/* TABLE */
+.table-wrapper {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.custom-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.custom-table th {
+  background: #f5f7fa;
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+}
+
+.custom-table td {
+  padding: 10px 12px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.custom-table tr:hover {
+  background-color: #fafafa;
+}
+
+/* STATUS BADGES */
+.status-badge {
+  padding: 4px 10px;
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 600;
+  display: inline-block;
+}
+
+/* Critical */
+.status-badge.alert,
+.status-badge.critical {
+  background: #fff1f0;
+  color: #cf1322;
+  border: 1px solid #ffa39e;
+}
+
+/* Warning */
+.status-badge.warning {
+  background: #fffbe6;
+  color: #d48806;
+  border: 1px solid #ffe58f;
+}
+
+/* Normal */
+.status-badge.normal {
+  background: #f6ffed;
+  color: #389e0d;
+  border: 1px solid #b7eb8f;
+}
+
+.sld-container {
+  background-color: #ffffff;
+  padding: 40px 50px;
+  border-radius: 16px;
+  border: 1px solid #e5e7eb;
+  min-height: 450px;
+}
+/* Professional glow effects */
+@keyframes pulseCritical {
+  0% { filter: drop-shadow(0 0 4px #ff3b30); }
+  50% { filter: drop-shadow(0 0 14px #ff3b30); }
+  100% { filter: drop-shadow(0 0 4px #ff3b30); }
+}
+
+@keyframes pulseWarning {
+  0% { filter: drop-shadow(0 0 4px #ff9f0a); }
+  50% { filter: drop-shadow(0 0 10px #ff9f0a); }
+  100% { filter: drop-shadow(0 0 4px #ff9f0a); }
+}
+
+.critical-glow {
+  animation: pulseCritical 2s infinite;
+}
+
+.warning-glow {
+  animation: pulseWarning 2s infinite;
+}

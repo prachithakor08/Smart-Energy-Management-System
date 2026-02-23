@@ -91,7 +91,14 @@ export default function Dashboard() {
         <hr style={{ margin: "30px 0" }} />
         
       
-        <h2>Grid Topology Visualization</h2>
+      <h2 style={{ 
+  fontSize: "20px", 
+  fontWeight: "700",
+  color: "#111827",
+  marginBottom: "20px"
+}}>
+  Grid Topology Visualization
+</h2>
 
         <SubstationSLD substations={results} />
 

@@ -29,6 +29,27 @@ export default function CsvUpload() {
     }
   };
 
+  const handleDownload = async () => {
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/download-report",
+      { results: result.results },
+      { responseType: "blob" }
+    );
+
+    const url = window.URL.createObjectURL(new Blob([response.data]));
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "Substation_Alert_Report.xlsx");
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+
+  } catch (error) {
+    alert("Error generating report");
+  }
+};
+
   return (
     <div style={{ padding: "20px" }}>
       <h2>CSV Alert Detection</h2>
@@ -46,51 +67,65 @@ export default function CsvUpload() {
       </button>
 
       {result && (
-  <div style={{ marginTop: "30px" }}>
-    
-    {/* Substation Summary */}
-    <div
-      style={{
-        padding: "15px",
-        borderRadius: "8px",
-        backgroundColor: "#fff1f0",
-        border: "1px solid #ff4d4f",
-        marginBottom: "20px"
-      }}
-    >
-      <h4 style={{ color: "#cf1322" }}>
-        🚨 Substation Alert Summary
-      </h4>
-      <p><strong>Substation ID:</strong> 1</p>
-      <p><strong>Status:</strong> CONTINUOUS ALERT</p>
-      <p><strong>Total Alert Windows:</strong> {result.results.length}</p>
+  <div className="csv-results">
+
+    {/* Summary Card */}
+    <div className="alert-summary-card">
+      <div className="summary-left">
+        <h4>🚨 Substation Alert Summary</h4>
+        <p><strong>Substation ID:</strong> 1</p>
+        <p>
+          <strong>Status:</strong> 
+          <span className="status-badge critical">
+            CONTINUOUS ALERT
+          </span>
+        </p>
+        <p><strong>Total Alert Windows:</strong> {result.results.length}</p>
+      </div>
     </div>
 
-    {/* Alert Details Table */}
-    <h5>Alert Detection Timeline</h5>
-    <table className="table table-bordered">
-      <thead>
-        <tr>
-          <th>Time Window (Row Range)</th>
-          <th>Anomaly Score</th>
-          <th>Status</th>
-        </tr>
-      </thead>
-      <tbody>
-        {result.results.map((r, index) => (
-          <tr key={index}>
-            <td>{r.window_start_row} – {r.window_end_row}</td>
-            <td>{r.anomalyScore.toFixed(2)}</td>
-            <td style={{ color: "#cf1322", fontWeight: "bold" }}>
-              {r.status}
-            </td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
-)}
+    {/* Timeline Table */}
+    <div className="timeline-card">
+      <h5>Alert Detection Timeline</h5>
 
+      <div className="table-wrapper">
+        <table className="custom-table">
+          <thead>
+            <tr>
+              <th>Time Window</th>
+              <th>Anomaly Score</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            {result.results.map((r, index) => (
+              <tr key={index}>
+                <td>
+                  {new Date(r.window_start_time).toLocaleTimeString()} –{" "}
+                  {new Date(r.window_end_time).toLocaleTimeString()}
+                </td>
+                <td>{r.anomalyScore.toFixed(2)}</td>
+                <td>
+                  <span className={`status-badge ${r.status.toLowerCase()}`}>
+                    {r.status}
+                  </span>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+            
+     </div>
+     <button
+            className="btn btn-primary btn-success mt-3"
+            onClick={handleDownload}
+          >
+          Generate Report (Excel)
+          </button>
+  </div>
+  
+)}
     </div>
   );
 }
