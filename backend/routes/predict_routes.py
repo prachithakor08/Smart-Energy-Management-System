@@ -108,9 +108,9 @@ def predict_alert_api():
 
     # -------------------- SEVERITY MAPPING --------------------
     if final_event:
-        if normalized_score >= 0.4:
+        if normalized_score >= 0.7:
             severity = "CRITICAL"
-        elif normalized_score >= 0.7:
+        elif normalized_score >= 0.4:
             severity = "WARNING"
         else:
             severity = "NORMAL"
