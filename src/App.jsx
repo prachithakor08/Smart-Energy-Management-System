@@ -25,7 +25,7 @@ function App() {
         <Route path="/" element={<Dashboard />} />
         <Route path="/alerts" element={<Alerts />} />
         <Route path="/alert-history" element={<AlertHistory />} />
-        <Route path="/reports" element={<Reports />} />
+        {/* <Route path="/reports" element={<Reports />} /> */}
         <Route path="/alerts/history" element={<AlertHistory />} />
         <Route path="/csv-upload" element={<CsvUpload />} />
 

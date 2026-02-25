@@ -107,13 +107,10 @@ def predict_alert_api():
     final_event = is_anomaly and pf_bad and loss_high
 
     # -------------------- SEVERITY MAPPING --------------------
-    if final_event:
-        if normalized_score >= 0.7:
-            severity = "CRITICAL"
-        elif normalized_score >= 0.4:
-            severity = "WARNING"
-        else:
-            severity = "NORMAL"
+    if recon_error >= 9.6:
+        severity = "CRITICAL"
+    elif recon_error >= 9.0:
+        severity = "WARNING"
     else:
         severity = "NORMAL"
 
@@ -141,7 +138,7 @@ def predict_alert_api():
     return jsonify({
         "substation_id": substation_id,
         "status": severity,
-        "anomalyScore": float(normalized_score)
+        "anomalyScore": float(recon_error)
     })
 
 

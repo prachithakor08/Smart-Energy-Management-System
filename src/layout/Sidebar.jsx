@@ -8,7 +8,7 @@ export default function Sidebar() {
       <NavLink to="/" style={styles.link}>Dashboard</NavLink>
       <NavLink to="/alerts" style={styles.link}>Alerts</NavLink>
       <NavLink to="/alert-history" style={styles.link}>Alert History</NavLink>
-      <NavLink to="/reports" style={styles.link}>Reports</NavLink>
+      {/* <NavLink to="/reports" style={styles.link}>Reports</NavLink> */}
       <NavLink to="/csv-upload" style={styles.link}>CSV Upload</NavLink>
 
       {/* <NavLink to="/devices" style={styles.link}>Device Connectivity</NavLink> */}

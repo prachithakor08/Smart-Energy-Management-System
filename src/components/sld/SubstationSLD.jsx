@@ -65,14 +65,13 @@ export default function SubstationSLD({ substations }) {
         ))}
 
         {/* SUBSTATIONS */}
-        {substations.map((s, i) => {
+       {substations.slice(0, positions.length).map((s, i) => {
           const [x, y] = positions[i];
           const config = getStatusConfig(s.status);
 
           return (
             <g key={s.id} className={config.glow}>
 
-              {/* Outer ring */}
               <circle
                 cx={x}
                 cy={y}
@@ -80,14 +79,16 @@ export default function SubstationSLD({ substations }) {
                 fill="#ffffff"
                 stroke={config.color}
                 strokeWidth="3"
+                style={{ transition: "all 0.5s ease" }}
               />
 
               {/* Inner core */}
-              <circle
+             <circle
                 cx={x}
                 cy={y}
                 r="20"
                 fill={config.color}
+                style={{ transition: "all 0.5s ease" }}
               />
 
               {/* Label */}
@@ -109,7 +110,7 @@ export default function SubstationSLD({ substations }) {
                 textAnchor="middle"
                 fontSize="18"
                 fill="#475569"
-                marginTop="40px"
+        
               >
                 {s.status}
               </text>
