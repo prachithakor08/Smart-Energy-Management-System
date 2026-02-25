@@ -133,7 +133,7 @@ python app.py
 ### Admin Dashboard Overview
 Displays total substations, active alerts, and alert severity summary with visualization
 
-![Dashboard Overview](screenshots/substation.png)
+![Dashboard Overview](screenshots/dashboard.png)
 
 ---
 
