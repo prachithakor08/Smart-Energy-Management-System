@@ -3,7 +3,7 @@ import pandas as pd
 from collections import defaultdict, deque
 from database import alerts_collection
 from datetime import datetime
-from models.model import predict_alert, FEATURE_COLS, WINDOW
+from models.model import predict_alert, classify_alert_severity, FEATURE_COLS, WINDOW
 import joblib
 import io
 
@@ -11,7 +11,6 @@ predict_bp = Blueprint("predict_bp", __name__)
 
 metadata = joblib.load("models/gruae_metadata_v2.pkl")
 RE_TH = metadata["recon_threshold"]
-PF_IDX = metadata["pf_index"]
 
 # Rolling buffer per substation
 substation_buffers = defaultdict(lambda: deque(maxlen=WINDOW))
@@ -88,32 +87,14 @@ def predict_alert_api():
     window_df = pd.DataFrame(list(substation_buffers[substation_id]))
 
     # -------------------- MODEL PREDICTION --------------------
-    _, recon_error = predict_alert(window_df)
+    is_alert,recon_error = predict_alert(window_df)
 
     # -------------------- SCORE NORMALIZATION --------------------
     normalized_score = recon_error / (RE_TH * 3)
 
 
-    # -------------------- DOMAIN LOGIC --------------------
-    pf = payload["Power Factor Total"]
-    PF_REF = 0.95
-
-    loss = (1 / (pf ** 2)) - (1 / (PF_REF ** 2))
-
-    is_anomaly = recon_error > RE_TH
-    pf_bad = pf < 0.8
-    loss_high = loss > 0.5
-
-    final_event = is_anomaly and pf_bad and loss_high
-
-    # -------------------- SEVERITY MAPPING --------------------
-    if recon_error >= 9.6:
-        severity = "CRITICAL"
-    elif recon_error >= 9.0:
-        severity = "WARNING"
-    else:
-        severity = "NORMAL"
-
+    severity = classify_alert_severity(recon_error)
+    is_alert = severity != "NORMAL"
 # -------------------- ALERT CREATION --------------------
     if severity != "NORMAL":
         existing = alerts_collection.find_one({
